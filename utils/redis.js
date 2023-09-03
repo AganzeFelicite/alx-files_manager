@@ -7,16 +7,14 @@ import { promisify } from 'util';
 
 class RedisClient {
   constructor() {
-    this.client = createClient();
-    this.isClientConnected = true;
+    this.client = createClient({
+      host: 'localhost',
+      port: 6379,
+    });
+
     // Handle the "error" event when the client is not connected
     this.client.on('error', (error) => {
       console.log('Redis Connection Error:', error);
-      this.isClientConnected = false;
-    });
-    // Handle the "connect" event when the client is connected
-    this.client.on('connect', () => {
-      this.isClientConnected = true;
     });
   }
 
@@ -27,9 +25,8 @@ class RedisClient {
      */
 
   isAlive() {
-    return this.isClientConnected;
+    return this.client.connected;
   }
-
   /**
      * get function that returns
      * the value of a key on the
@@ -39,7 +36,8 @@ class RedisClient {
      */
 
   async get(key) {
-    return promisify(this.client.GET).bind(this.client)(key);
+    const getAsync = promisify(this.client.GET).bind(this.client);
+    return getAsync(key);
   }
 
   /**
@@ -51,8 +49,8 @@ class RedisClient {
    */
 
   async set(key, value, duration) {
-    await promisify(this.client.SETEX)
-      .bind(this.client)(key, value, duration);
+    const setAsync = promisify(this.client.SET).bind(this.client);
+    return setAsync(key, value, 'EX', duration);
   }
 
   /**
@@ -64,7 +62,7 @@ class RedisClient {
     */
 
   async del(key) {
-    await promisify(this.client.DEL)
+    return promisify(this.client.DEL)
       .bind(this.client)(key);
   }
 }
