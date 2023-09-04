@@ -37,6 +37,13 @@ class DBClient {
     return this.db.collection('users').countDocuments();
   }
 
+  async findUser(user) {
+    return this.db.collection('users').findOne(user);
+  }
+
+  async createUser(user) {
+    return this.db.collection('users').insertOne(user);
+  }
   /**
      * nbFiles is a function that
      * returns the number of document
