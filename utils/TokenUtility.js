@@ -15,7 +15,7 @@ class TokenUtility {
 
   static async retrieveBaseOnToken(request) {
     const userToken = request.headers['x-token'];
-    console.log(userToken);
+    //console.log(userToken);
     const userId = await redisClient.get(`auth_${userToken}`);
     return userId;
   }
