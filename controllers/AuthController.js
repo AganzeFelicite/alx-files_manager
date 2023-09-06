@@ -12,7 +12,7 @@ class AuthController {
     const Authorization = request.header('Authorization') || '';
     // console.log("hellp")
     const infoCoded = Authorization.split(' ')[1];
-    if (!infoCoded) return response.status(401).json({ error: 'Unauthorized' });
+
     const credentialsDecoded = Buffer.from(infoCoded, 'base64').toString(
       'utf-8',
     );
@@ -28,7 +28,7 @@ class AuthController {
     if (!user) return response.status(401).json({ error: 'Unauthorized' });
     // console.log(user.password)
     // console.log(user)
-    const newToken = await TokenUtility.tokenGenerator(user._id);
+    const newToken = await TokenUtility.tokenGenerator(user._id.toString());
 
     return response.status(200).json({ token: newToken });
   }
