@@ -9,7 +9,7 @@ class TokenUtility {
   static async tokenGenerator(userId) {
     const token = uuidv4();
     const key = `auth_${token}`;
-    await redisClient.set(key, userId.toString(), 60 * 60 * 24);
+    await redisClient.set(key, userId, 60 * 60 * 24);
     return token;
   }
 
