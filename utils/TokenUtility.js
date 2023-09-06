@@ -14,15 +14,22 @@ class TokenUtility {
   }
 
   static async retrieveBaseOnToken(request) {
-    const userToken = request.headers['x-token'];
+    const userToken = request.header['X-Token'];
     // console.log(userToken);
     const userId = await redisClient.get(`auth_${userToken}`);
     return userId;
   }
 
   static async deleteToken(request) {
-    const userToken = request.headers['x-token'];
-    await redisClient.del(`auth_${userToken}`);
+    const token = request.header('X-Token');
+    const key = `auth_${token}`;
+    if (id) {
+      await redisClient.del(key);
+      response.status(204).json({});
+    } else {
+      response.status(401).json({ error: 'Unauthorized' });
+    }
+   
   }
 }
 
