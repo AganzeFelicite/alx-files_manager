@@ -38,7 +38,7 @@ class AuthController {
     // console.log(hi)
     if (!user) return response.status(401).json({ error: 'Unauthorized' });
     await TokenUtility.deleteToken(request);
-    return response.status(201).end();
+    return response.status(204).end();
   }
 }
 
