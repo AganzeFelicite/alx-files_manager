@@ -29,16 +29,16 @@ class userController {
 
   static async getMe(request, response) {
     const tokenValue = request.headers['x-token'];
-    console.log(tokenValue);
+    //console.log(tokenValue);
     if (!tokenValue) return response.status(401).json({ error: 'Unauthorized' });
     const userId = await TokenUtility.retrieveBaseOnToken(request);
-    console.log(userId);
+    //console.log(userId);
     const objectId = new ObjectId(userId);
     if (!userId) return response.status(401).json({ error: 'Unauthorized' });
-    console.log(objectId);
+    //console.log(objectId);
     const user = await dbClient.findUserById(userId);
 
-    console.log(user);
+    //console.log(user);
     return response.status(201).json({ id: user._id, email: user.email });
   }
 }
