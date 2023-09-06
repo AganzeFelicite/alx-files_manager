@@ -33,9 +33,12 @@ class userController {
     if (!tokenValue) return response.status(401).json({ error: 'Unauthorized' });
     const userId = await TokenUtility.retrieveBaseOnToken(request);
     console.log(userId);
+    const objectId = new ObjectId(userId);
     if (!userId) return response.status(401).json({ error: 'Unauthorized' });
+    console.log(objectId);
+    const user = await dbClient.findUserById(userId);
 
-    const user = dbClient.findUser({ _id: ObjectId(userId) });
+    console.log(user);
     return response.status(201).json({ id: user._id, email: user.email });
   }
 }
