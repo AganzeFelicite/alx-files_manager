@@ -1,8 +1,9 @@
 import sha1 from 'sha1';
 import Bull from 'bull';
-// import ObjectId from 'mongodb';
+// import ObjectID from 'mongodb';
 import dbClient from '../utils/db';
-import TokenUtility from '../utils/TokenUtility';
+// import TokenUtility from '../utils/TokenUtility';
+import redisClient from '../utils/redis';
 
 /**
  * this is the userController
@@ -28,19 +29,32 @@ class userController {
   }
 
   static async getMe(request, response) {
-    const tokenValue = request.headers['x-token'];
-    // console.log(tokenValue);
-    if (!tokenValue) return response.status(401).json({ error: 'Unauthorized' });
-    const userId = await TokenUtility.retrieveBaseOnToken(request);
-    // console.log(userId);
-    // const objectId = new ObjectId(userId);
-    if (!userId) return response.status(401).json({ error: 'Unauthorized' });
-    // console.log(objectId);
-    const user = await dbClient.findUserById(userId);
-    if (!user) return response.status(401).json({ error: 'Unauthorized' });
+  //   const tokenValue = request.headers['x-token'];
+  //   // console.log(tokenValue);
+  //   if (!tokenValue) return response.status(401).json({ error: 'Unauthorized' });
+  //   const userId = await TokenUtility.retrieveBaseOnToken(request);
+  //   // console.log(userId);
+  //   // const objectId = new ObjectId(userId);
+  //   if (!userId) return response.status(401).json({ error: 'Unauthorized' });
+  //   // console.log(objectId);
+  //   const user = await dbClient.findUserById(userId);
+  //   if (!user) return response.status(401).json({ error: 'Unauthorized' });
 
-    // console.log(user);
-    return response.status(201).json({ id: user._id, email: user.email });
+    //   // console.log(user);
+    //   return response.status(201).json({ id: user._id, email: user.email });
+    // }
+    const token = request.header('X-Token');
+    const key = `auth_${token}`;
+    const userId = await redisClient.get(key);
+
+    // const idObject = new ObjectID(userId);
+    const user = await dbClient.findUserById(userId);
+    // console.log(user)
+    if (user) {
+      response.status(200).json({ id: userId, email: user.email });
+    } else {
+      response.status(401).json({ error: 'Unauthorized' });
+    }
   }
 }
 
