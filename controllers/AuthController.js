@@ -18,12 +18,18 @@ class AuthController {
     );
 
     const [email, password] = credentialsDecoded.split(':');
+    const sha1Password = sha1(password);
     if (!email || !password) return response.status(401).json({ error: 'Unauthorized' });
-    const user = await dbClient.findUser({ email });
+    const user = await dbClient.findUser({
+      email,
+      password: sha1Password,
+    });
+
     if (!user) return response.status(401).json({ error: 'Unauthorized' });
     // console.log(user.password)
-    if (sha1(password) !== user.password) return response.status(401).json({ error: 'Unauthorized' });
+    // console.log(user)
     const newToken = await TokenUtility.tokenGenerator(user._id);
+
     return response.status(200).json({ token: newToken });
   }
 
@@ -31,8 +37,8 @@ class AuthController {
     const user = await TokenUtility.retrieveBaseOnToken(request);
     // console.log(hi)
     if (!user) return response.status(401).json({ error: 'Unauthorized' });
-    await TokenUtility.getConnect(response);
-    return request.status(201).end();
+    await TokenUtility.deleteToken(request);
+    return response.status(201).end();
   }
 }
 
