@@ -14,14 +14,13 @@ class TokenUtility {
   }
 
   static async retrieveBaseOnToken(request) {
-    const userToken = request.headers['x-token'];
-
+    const userToken = request.header('X-Token');
     const userId = await redisClient.get(`auth_${userToken}`);
     return userId;
   }
 
   static async deleteToken(request) {
-    const userToken = request.headers['x-token'];
+    const userToken = request.header('X-Token');
     await redisClient.del(`auth_${userToken}`);
   }
 }
