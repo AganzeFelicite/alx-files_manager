@@ -19,23 +19,24 @@ class AuthController {
 
     const [email, password] = credentialsDecoded.split(':');
     const sha1Password = sha1(password);
-    if (!email || !password) return response.status(401).json({ error: 'Unauthorized' });
     const user = await dbClient.findUser({
       email,
       password: sha1Password,
     });
 
+    if (sha1Password !== user.password) return response.status(401).json({ error: 'Unauthorized' });
+
     if (!user) return response.status(401).json({ error: 'Unauthorized' });
     // console.log(user.password)
     // console.log(user)
-    const newToken = await TokenUtility.tokenGenerator(user._id.toString());
+    const token = await TokenUtility.tokenGenerator(user._id.toString());
 
-    return response.status(200).json({ token: newToken });
+    return response.status(200).json({ token });
   }
 
   static async getDisconnect(request, response) {
     const user = await TokenUtility.retrieveBaseOnToken(request);
-    // console.log(hi)
+    
     if (!user) return response.status(401).json({ error: 'Unauthorized' });
     await TokenUtility.deleteToken(request);
     return response.status(204).end();
